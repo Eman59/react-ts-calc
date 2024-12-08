@@ -11,16 +11,25 @@ export const config = {
     asin: Math.asin,
     acos: Math.acos,
     atan: Math.atan,
+    cot: (x: number) => 1 / Math.tan(x),  // cot(x) = 1/tan(x)
+    sec: (x: number) => 1 / Math.cos(x),  // sec(x) = 1/cos(x)
+    csc: (x: number) => 1 / Math.sin(x),  // csc(x) = 1/sin(x)
+    sinh: Math.sinh,   // Hyperbolic sine
+    cosh: Math.cosh,   // Hyperbolic cosine
+    tanh: Math.tanh,   // Hyperbolic tangent
+    asinh: Math.asinh, // Inverse hyperbolic sine
+    acosh: Math.acosh, // Inverse hyperbolic cosine
+    atanh: Math.atanh, // Inverse hyperbolic tangent
   },
-  operators: ["+", "-", "*", "/", "^"],
+  operators: ["+", "-", "*", "/", "^", "%"], // Added modulus operator (%)
   featureFlags: {
-    allowFormulaSaving: true, // Keep if saving formulas is required
-    allowLatexRendering: true, // Keep if LaTeX rendering is required
+    allowFormulaSaving: true,
+    allowLatexRendering: true,
   },
   permissions: {
-    canViewSavedFormulas: true, // Keep if users should view saved formulas
-    canManageVariables: true, // Keep if users should manage (edit) variables,
-    canCopyFormula: true, // Permission for copying formulas to clipboard
-    canDeleteSavedFormulas: true, // Whether the user can delete saved formulas
+    canViewSavedFormulas: true,
+    canManageVariables: true,
+    canCopyFormula: true,
+    canDeleteSavedFormulas: true,
   },
 };

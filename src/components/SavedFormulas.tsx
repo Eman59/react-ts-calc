@@ -24,7 +24,10 @@ const SavedFormulas: React.FC<SavedFormulasProps> = ({
 }) => {
   return (
     <div className="w-full max-w-md mx-auto bg-white shadow-lg p-4 rounded mt-6">
-      <h2 className="text-lg font-bold text-gray-800">Saved Formulas</h2>
+        <h2 className="text-lg font-medium text-gray-800 text-center">
+          Saved Formulas
+        </h2>
+
       {savedFormulas.length > 0 ? (
         <ul className="space-y-2 mt-4 transition-all">
           {savedFormulas.map((savedFormula, index) => (
