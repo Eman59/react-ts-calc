@@ -6,6 +6,14 @@ export const FormulaInput: React.FC<{
 }> = ({ formula, setFormula }) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // To store the colors assigned to variables
+  const variableColorMap: { [key: string]: string } = {};
+  const colorPalette = [
+    "text-red-500", "text-blue-500", "text-green-500", "text-yellow-500", 
+    "text-purple-500", "text-orange-500", "text-pink-500", "text-teal-500"
+  ];
+  let colorIndex = 0;
+
   const highlightFormula = (text: string) => {
     const operatorRegex = /(\+|\-|\*|\/|\^)/g; // Operators
     const functionRegex = /\b(sin|cos|tan|log|sqrt|abs)\b/gi; // Functions
@@ -53,22 +61,23 @@ export const FormulaInput: React.FC<{
             {matchedText}
           </span>
         );
-      } else if (variableRegex.test(matchedText)) {
-        tokens.push(
-          <span key={`variable-${match.index}`} className="text-orange-500">
-            {matchedText}
-          </span>
-        );
       } else {
+        // If variable is already assigned a color, reuse that color
+        if (!variableColorMap[matchedText]) {
+          // Assign a new color if not yet assigned
+          variableColorMap[matchedText] = colorPalette[colorIndex % colorPalette.length];
+          colorIndex++;
+        }
+
         tokens.push(
-          <span key={`variable-${match.index}`} className="text-black">
+          <span key={`variable-${match.index}`} className={variableColorMap[matchedText]}>
             {matchedText}
           </span>
         );
       }
 
       lastIndex = match.index + matchedText.length;
-    }
+    } 
 
     // Add remaining unmatched text as plain text
     if (lastIndex < text.length) {
