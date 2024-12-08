@@ -35,21 +35,22 @@ export const FormulaInput: React.FC<{
   const highlightFormula = (text: string) => {
     const operatorRegex = /(\+|-|\*|\/|\^)/g; // Operators
     const functionRegex = /\b(sin|cos|tan|log|sqrt|abs)\b/gi; // Functions
-    const numberRegex = /\b\d+(\.\d+)?\b/g; // Numbers
-    const variableRegex = /\b[a-zA-Z_][a-zA-Z0-9_]*\b/g; // Variables
+    const numberRegex = /\b\d+(\.\d+)?\b|\d+(?=[a-zA-Z])/g; // Numbers, including cases like 2 in 2ab
+    const variableRegex = /[a-zA-Z_][a-zA-Z0-9_]*/g; // Variables
+    const bracketsRegex = /[\u0028\u0029\u007B\u007D\u005B\u005D]/g; // All types of brackets
 
     const tokens: React.JSX.Element[] = [];
-    let match: RegExpExecArray | [string] | null;
     let lastIndex = 0;
 
     // Combined regex to tokenize
     const combinedRegex = new RegExp(
-      `${functionRegex.source}|${operatorRegex.source}|${numberRegex.source}|${variableRegex.source}`,
+      `${bracketsRegex.source}|${functionRegex.source}|${operatorRegex.source}|${numberRegex.source}|${variableRegex.source}`,
       "gi"
     );
 
+    let match;
     while ((match = combinedRegex.exec(text)) !== null) {
-      // Add unmatched text as plain text (default to black)
+      // Add unmatched text as plain text
       if (match.index > lastIndex) {
         tokens.push(
           <span key={`plain-${lastIndex}`} className="text-black">
@@ -60,22 +61,21 @@ export const FormulaInput: React.FC<{
 
       const [matchedText] = match;
 
-      // Highlight based on the matched group
-      if (operatorRegex.test(matchedText)) {
+      if (bracketsRegex.test(matchedText)) {
         tokens.push(
-          <span
-            key={`operator-${match.index}`}
-            className="text-blue-500 font-bold"
-          >
+          <span key={`brackets-${match.index}`} className="text-gray-500">
             {matchedText}
           </span>
         );
       } else if (functionRegex.test(matchedText)) {
         tokens.push(
-          <span
-            key={`function-${match.index}`}
-            className="text-green-500 font-semibold"
-          >
+          <span key={`function-${match.index}`} className="text-green-500 font-semibold">
+            {matchedText}
+          </span>
+        );
+      } else if (operatorRegex.test(matchedText)) {
+        tokens.push(
+          <span key={`operator-${match.index}`} className="text-blue-500 font-bold">
             {matchedText}
           </span>
         );
@@ -86,19 +86,14 @@ export const FormulaInput: React.FC<{
           </span>
         );
       } else {
-        // If variable is already assigned a color, reuse that color
+        // Variable
         if (!variableColorMap[matchedText]) {
-          // Assign a new color if not yet assigned
-          variableColorMap[matchedText] =
-            colorPalette[colorIndex % colorPalette.length];
+          variableColorMap[matchedText] = colorPalette[colorIndex % colorPalette.length];
           colorIndex++;
         }
 
         tokens.push(
-          <span
-            key={`variable-${match.index}`}
-            className={variableColorMap[matchedText]}
-          >
+          <span key={`variable-${match.index}`} className={variableColorMap[matchedText]}>
             {matchedText}
           </span>
         );

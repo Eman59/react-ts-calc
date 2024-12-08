@@ -15,7 +15,7 @@ export const VariableInput: React.FC<{
 
   return (
     <div className="flex items-center space-x-2 mt-2">
-      <label>{variable}:</label>
+      <label>{variable} = </label>
       <input
         type="text"
         value={value || ""}
