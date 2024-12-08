@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
 import { docco } from "react-syntax-highlighter/dist/esm/styles/hljs";
-import { config } from "../config.ts";
+import { config } from "../config/config.ts";
 
 export const FormulaInput: React.FC<{
   formula: string;

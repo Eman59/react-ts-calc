@@ -1,4 +1,4 @@
-import { config } from "../config.ts";
+import { config } from "../config/config.ts";
 
 export class MathEvaluator {
   public static advancedFunctions = config.advancedFunctions;
