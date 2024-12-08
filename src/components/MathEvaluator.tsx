@@ -119,14 +119,13 @@ export class MathEvaluator {
     const tokens: string[] = [];
     let currentToken = "";
     const advancedFunctions = Object.keys(this.advancedFunctions);
-
+  
     for (let i = 0; i < formula.length; i++) {
       const char = formula[i];
       const remainingFormula = formula.slice(i);
       const foundFunction = advancedFunctions.find((func) =>
         remainingFormula.startsWith(func)
       );
-
       if (foundFunction) {
         if (currentToken) {
           tokens.push(currentToken);
@@ -146,30 +145,39 @@ export class MathEvaluator {
           currentToken = "";
         }
       } else {
-        // Handle adjacent variables like "1w" -> "1 * w"
-        if (
-          char.match(/[a-zA-Z]/) &&
-          currentToken &&
-          currentToken.match(/\d/)
-        ) {
-          tokens.push(currentToken); // Push previous number (e.g., "1")
+        // Handle number followed by variable (e.g., "n1" -> "n * 1")
+        if (char.match(/\d/) && currentToken.match(/[a-zA-Z]/)) {
+          tokens.push(currentToken); // Push the previous variable (e.g., "n")
           tokens.push("*"); // Insert multiplication symbol
-          currentToken = char; // Start new variable (e.g., "w")
-        } else if (char.match(/[a-zA-Z]/) && currentToken.match(/[a-zA-Z]/)) {
-          // If two variables are adjacent, treat it as multiplication
-          tokens.push(currentToken);
-          tokens.push("*");
-          currentToken = char;
+          currentToken = char; // Start the number (e.g., "1")
+        } else if (
+          char.match(/\d/) &&
+          (i + 1 < formula.length && formula[i + 1].match(/[a-zA-Z]/))
+        ) {
+          // Case when a number is followed by a variable (e.g., "1n" -> "1 * n")
+          if (currentToken) {
+            tokens.push(currentToken);
+          }
+          tokens.push(char); // Push the number (e.g., "1")
+          tokens.push("*"); // Insert multiplication symbol
+        } else if (
+          char.match(/[a-zA-Z]/) &&
+          currentToken.match(/[a-zA-Z]/)
+        ) {
+          // Handle adjacent variables (e.g., "aa" -> "a * a")
+          tokens.push(currentToken); // Push the previous variable (e.g., "a")
+          tokens.push("*"); // Insert multiplication symbol
+          currentToken = char; // Start new variable (e.g., "a")
         } else {
           currentToken += char;
         }
       }
     }
-
+  
     if (currentToken) {
       tokens.push(currentToken);
     }
-
+  
     return tokens;
   }
 

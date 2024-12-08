@@ -4,8 +4,10 @@ import { config } from "./config.ts";
 import { VariableInput } from "./components/VariableInput.tsx";
 import { ResultDisplay } from "./components/ResultDisplay.tsx";
 import { FormulaInput } from "./components/FormulaInput.tsx";
-import "katex/dist/katex.min.css";
 import { MathEvaluator } from "./components/MathEvaluator.tsx";
+import DeleteIcon from "./assets/svg/delete.tsx";
+import CopyIcon from "./assets/svg/copy.tsx";
+import "katex/dist/katex.min.css";
 
 const FormulaCalculator: React.FC = () => {
   const [formula, setFormula] = useState<string>("");
@@ -13,7 +15,9 @@ const FormulaCalculator: React.FC = () => {
   const [result, setResult] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [latexFormula, setLatexFormula] = useState<string>("");
-  const [savedFormulas, setSavedFormulas] = useState<{ formula: string; latex: string }[]>(() => {
+  const [savedFormulas, setSavedFormulas] = useState<
+    { formula: string; latex: string }[]
+  >(() => {
     const saved = localStorage.getItem("savedFormulas");
     return saved ? JSON.parse(saved) : [];
   });
@@ -108,6 +112,12 @@ const FormulaCalculator: React.FC = () => {
     localStorage.setItem("savedFormulas", JSON.stringify(updated));
   };
 
+  const copyToClipboard = (latex: string) => {
+    navigator.clipboard.writeText(latex).then(() => {
+      alert("Formula copied to clipboard!");
+    });
+  };
+
   const filteredVariables = useMemo(() => {
     return extractVariables.filter((variable) =>
       variable.toLowerCase().includes(variableInput.toLowerCase())
@@ -115,20 +125,20 @@ const FormulaCalculator: React.FC = () => {
   }, [variableInput, extractVariables]);
 
   const cleanFormula = (formula: string): string => {
-    // Replace '\\' with '' to remove LaTeX backslashes
-    return formula.replace(/\\(?!\\)/g, '');  // Remove single backslashes that are used in LaTeX
+    return formula?.replace(/\\(?!\\)/g, ""); // Remove single backslashes that are used in LaTeX
   };
-
 
   return (
     <div className="container mx-auto p-4">
       <div className="max-w-lg mx-auto bg-gradient-to-b from-gray-100 to-white shadow-lg rounded-lg p-6">
-        <h1 className="text-2xl font-extrabold text-center text-gray-800 mb-4">Advanced Formula Calculator</h1>
+        <h1 className="text-2xl font-extrabold text-center text-gray-800 mb-4">
+          Formula Calculator
+        </h1>
 
         {/* Display LaTeX or Syntax Highlighting */}
-        <div className="relative h-32 transition-all">
+        <div className="relative min-h-[100px] transition-all overflow-auto">
           <div
-            className={'absolute inset-0 p-4 bg-gray-50 border rounded shadow-inner opacity-100 scale-100 transition-opacity transition-transform duration-300 opacity-100 scale-100'}
+            className="p-4 bg-gray-50 border rounded shadow-inner whitespace-pre-wrap word-wrap break-word min-h-[80px] text-lg"
             dangerouslySetInnerHTML={{ __html: renderLatex() }}
           />
         </div>
@@ -175,17 +185,27 @@ const FormulaCalculator: React.FC = () => {
                   className="flex justify-between items-center p-2 bg-gray-100 hover:bg-gray-200 rounded shadow transition-all"
                 >
                   <div>
-                    <span className="text-gray-700 font-medium" dangerouslySetInnerHTML={{
-                      __html: cleanFormula(savedFormula.latex
-                      )
-                    }} />
+                    <span
+                      className="text-gray-700 font-medium"
+                      dangerouslySetInnerHTML={{
+                        __html: cleanFormula(savedFormula.latex),
+                      }}
+                    />
                   </div>
-                  <button
-                    onClick={() => removeFormula(index)}
-                    className="text-red-500 font-semibold underline hover:text-red-600 transition"
-                  >
-                    Remove
-                  </button>
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => copyToClipboard(savedFormula.latex)}
+                      className="text-blue-500 font-semibold hover:text-blue-600 transition"
+                    >
+                      <CopyIcon />
+                    </button>
+                    <button
+                      onClick={() => removeFormula(index)}
+                      className="text-red-500 font-semibold underline hover:text-red-600 transition"
+                    >
+                      <DeleteIcon />
+                    </button>
+                  </div>
                 </li>
               ))}
             </ul>
