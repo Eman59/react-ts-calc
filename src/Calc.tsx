@@ -8,7 +8,7 @@ import { ResultDisplay } from "./components/ResultDisplay.tsx";
 import SavedFormulas from "./components/SavedFormulas.tsx";
 import "katex/dist/katex.min.css";
 
-function App() {
+function Calc() {
   const [formula, setFormula] = useState<string>("");
   const [variables, setVariables] = useState<Record<string, number>>({});
   const [result, setResult] = useState<number | null>(null);
@@ -93,7 +93,7 @@ function App() {
   };
 
   const saveFormula = () => {
-    // Check if the formula already exists in the saved formulas
+    // To Check if the formula already exists in the saved formulas
     if (savedFormulas.some((saved) => saved.formula === formula)) {
       return; // Do not save if the formula is already in the list
     }
@@ -118,7 +118,7 @@ function App() {
             Formula Calculator
           </h1>
 
-          {/* Display LaTeX or Syntax Highlighting */}
+          {/* Display LaTeX */}
           {config.featureFlags.allowLatexRendering && (
             <div
               className="p-4 bg-gray-50 border rounded shadow-inner whitespace-pre-wrap word-wrap break-word min-h-[80px] text-lg"
@@ -141,6 +141,7 @@ function App() {
             ))}
           </div>
 
+          {/* Result Display */}
           <div className="mt-6">
             <ResultDisplay result={result} error={error} />
           </div>
@@ -168,4 +169,4 @@ function App() {
   );
 }
 
-export default App;
+export default Calc;
