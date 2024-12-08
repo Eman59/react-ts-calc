@@ -1,7 +1,5 @@
 import React, { useState, useCallback, useMemo, useEffect } from "react";
 import katex from "katex";
-import { docco } from "react-syntax-highlighter/dist/esm/styles/hljs";
-import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
 import { config } from "./config.ts";
 import { VariableInput } from "./components/VariableInput.tsx";
 import { ResultDisplay } from "./components/ResultDisplay.tsx";
@@ -9,22 +7,18 @@ import { FormulaInput } from "./components/FormulaInput.tsx";
 import "katex/dist/katex.min.css";
 import { MathEvaluator } from "./components/MathEvaluator.tsx";
 
-// FormulaCalculator Main Component
 const FormulaCalculator: React.FC = () => {
   const [formula, setFormula] = useState<string>("");
   const [variables, setVariables] = useState<Record<string, number>>({});
   const [result, setResult] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [latexFormula, setLatexFormula] = useState<string>("");
-
-  const [savedFormulas, setSavedFormulas] = useState<string[]>(() => {
+  const [savedFormulas, setSavedFormulas] = useState<{ formula: string; latex: string }[]>(() => {
     const saved = localStorage.getItem("savedFormulas");
     return saved ? JSON.parse(saved) : [];
   });
-  const [showLatex, setShowLatex] = useState<boolean>(false);
-  const [variableInput,] = useState<string>("");
+  const [variableInput] = useState<string>("");
 
-  // Extract variables from the formula
   const extractVariables = useMemo(() => {
     const variableSet = new Set<string>();
     const tokens = MathEvaluator.tokenize(formula);
@@ -96,7 +90,14 @@ const FormulaCalculator: React.FC = () => {
   };
 
   const saveFormula = () => {
-    const updated = [...savedFormulas, formula];
+    // Check if the formula already exists in the saved formulas
+    if (savedFormulas.some((saved) => saved.formula === formula)) {
+      alert("Formula already saved.");
+      return; // Do not save if the formula is already in the list
+    }
+
+    // Add formula and its LaTeX version to the saved list
+    const updated = [...savedFormulas, { formula, latex: latexFormula }];
     setSavedFormulas(updated);
     localStorage.setItem("savedFormulas", JSON.stringify(updated));
   };
@@ -113,74 +114,48 @@ const FormulaCalculator: React.FC = () => {
     );
   }, [variableInput, extractVariables]);
 
+  const cleanFormula = (formula: string): string => {
+    // Replace '\\' with '' to remove LaTeX backslashes
+    return formula.replace(/\\(?!\\)/g, '');  // Remove single backslashes that are used in LaTeX
+  };
+
+
   return (
-    <div className="container mx-auto p-4 space-y-4">
-      <div className="w-full max-w-md mx-auto bg-white shadow p-4 rounded">
-        <h1 className="text-xl font-bold">Advanced Formula Calculator</h1>
+    <div className="container mx-auto p-4">
+      <div className="max-w-lg mx-auto bg-gradient-to-b from-gray-100 to-white shadow-lg rounded-lg p-6">
+        <h1 className="text-2xl font-extrabold text-center text-gray-800 mb-4">Advanced Formula Calculator</h1>
 
-        {/* Toggle Button to Switch Between Latex and Syntax Highlighting */}
-        {config.featureFlags.enableLatexMode || config.featureFlags.enableSyntaxHighlighting ? (
-          <div className="flex justify-between items-center mt-4 mb-4">
-            <label className="flex items-center cursor-pointer">
-              <div className="relative">
-                <input
-                  type="checkbox"
-                  className="sr-only"
-                  checked={showLatex}
-                  onChange={() => setShowLatex(!showLatex)}
-                  disabled={!config.featureFlags.enableLatexMode && !config.featureFlags.enableSyntaxHighlighting}
-                />
-                <div className="w-14 h-8 bg-gradient-to-r from-blue-500 to-teal-500 rounded-full shadow-inner transition-all duration-300 ease-in-out"></div>
-                <div
-                  className={`absolute left-1 top-1 w-6 h-6 bg-white rounded-full shadow-md transform transition-transform duration-300 ease-in-out
-                  ${showLatex ? "translate-x-6 bg-blue-600" : "translate-x-0 bg-gray-200"}`}
-                ></div>
-              </div>
-              <span className="ml-4 text-xl text-gray-800 font-semibold">
-                {showLatex ? "LaTeX Mode" : "Syntax Highlighting"}
-              </span>
-            </label>
-          </div>
-        ) : null}
-
-        {/* Conditionally Render LaTeX or Syntax Highlighting */}
-        {showLatex && config.featureFlags.enableLatexMode ? (
+        {/* Display LaTeX or Syntax Highlighting */}
+        <div className="relative h-32 transition-all">
           <div
-            className="mt-4"
-            dangerouslySetInnerHTML={{
-              __html: renderLatex(),
-            }}
+            className={'absolute inset-0 p-4 bg-gray-50 border rounded shadow-inner opacity-100 scale-100 transition-opacity transition-transform duration-300 opacity-100 scale-100'}
+            dangerouslySetInnerHTML={{ __html: renderLatex() }}
           />
-        ) : (
-          formula && config.featureFlags.enableSyntaxHighlighting && (
-            <SyntaxHighlighter language="javascript" style={docco}>
-              {formula || ""}
-            </SyntaxHighlighter>
-          )
-        )}
+        </div>
 
-        {/* Formula Input */}
+        {/* Formula Input with Syntax Highlighting */}
         <FormulaInput formula={formula} setFormula={setFormula} />
 
         {/* Variable Inputs */}
-        {filteredVariables.map((variable) => (
-          <VariableInput
-            key={variable}
-            variable={variable}
-            value={variables[variable] || 0}
-            onChange={(value) => handleVariableChange(variable, value)}
-          />
-        ))}
+        <div className="mt-4 space-y-2">
+          {filteredVariables.map((variable) => (
+            <VariableInput
+              key={variable}
+              variable={variable}
+              value={variables[variable] || 0}
+              onChange={(value) => handleVariableChange(variable, value)}
+            />
+          ))}
+        </div>
 
-        <div className="mt-4">
+        <div className="mt-6">
           <ResultDisplay result={result} error={error} />
         </div>
 
-        {/* Save Formula Button - Only Enabled If Feature Flag is On */}
         {config.featureFlags.allowFormulaSaving && (
           <button
             onClick={saveFormula}
-            className="bg-blue-500 text-white px-4 py-2 rounded mt-4"
+            className="w-full bg-gradient-to-r from-blue-500 to-teal-500 text-white font-semibold py-2 rounded mt-4 hover:shadow-md hover:opacity-90 transition"
             disabled={!formula}
           >
             Save Formula
@@ -190,19 +165,35 @@ const FormulaCalculator: React.FC = () => {
 
       {/* Saved Formulas Section */}
       {config.permissions.canViewSavedFormulas && (
-        <div className="w-full max-w-md mx-auto bg-white shadow p-4 rounded mt-4">
-          <h2 className="text-lg font-bold">Saved Formulas</h2>
-          {savedFormulas.map((savedFormula, index) => (
-            <div key={index} className="flex items-center justify-between mt-2">
-              <span>{savedFormula}</span>
-              <button
-                onClick={() => removeFormula(index)}
-                className="text-red-500 underline"
-              >
-                Remove
-              </button>
-            </div>
-          ))}
+        <div className="w-full max-w-md mx-auto bg-white shadow-lg p-4 rounded mt-6">
+          <h2 className="text-lg font-bold text-gray-800">Saved Formulas</h2>
+          {savedFormulas.length > 0 ? (
+            <ul className="space-y-2 mt-4 transition-all">
+              {savedFormulas.map((savedFormula, index) => (
+                <li
+                  key={index}
+                  className="flex justify-between items-center p-2 bg-gray-100 hover:bg-gray-200 rounded shadow transition-all"
+                >
+                  <div>
+                    <span className="text-gray-700 font-medium" dangerouslySetInnerHTML={{
+                      __html: cleanFormula(savedFormula.latex
+                      )
+                    }} />
+                  </div>
+                  <button
+                    onClick={() => removeFormula(index)}
+                    className="text-red-500 font-semibold underline hover:text-red-600 transition"
+                  >
+                    Remove
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-gray-500 mt-4 text-center italic">
+              No saved formulas available.
+            </p>
+          )}
         </div>
       )}
     </div>

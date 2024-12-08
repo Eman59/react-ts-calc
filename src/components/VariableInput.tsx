@@ -21,7 +21,7 @@ export const VariableInput: React.FC<{
         value={value || ""}
         onChange={handleInputChange}
         className="flex-grow border rounded px-2 py-1"
-        placeholder="Enter number"
+        placeholder="Enter Value"
       />
     </div>
   );

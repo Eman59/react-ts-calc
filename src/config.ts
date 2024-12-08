@@ -15,8 +15,6 @@ export const config = {
   },
   operators: ["+", "-", "*", "/", "^"],
   featureFlags: {
-    enableLatexMode: true,
-    enableSyntaxHighlighting: true,
     allowFormulaSaving: true,
   },
   permissions: {
