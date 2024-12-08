@@ -3,7 +3,7 @@ import katex from "katex";
 import { docco } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
 import { config } from "./config.ts";
-import { VariableSlider } from "./components/VariableSlider.tsx";
+import { VariableInput } from "./components/VariableInput.tsx";
 import { ResultDisplay } from "./components/ResultDisplay.tsx";
 import { FormulaInput } from "./components/FormulaInput.tsx";
 import "katex/dist/katex.min.css";
@@ -164,7 +164,7 @@ const FormulaCalculator: React.FC = () => {
 
         {/* Variable Inputs */}
         {filteredVariables.map((variable) => (
-          <VariableSlider
+          <VariableInput
             key={variable}
             variable={variable}
             value={variables[variable] || 0}
