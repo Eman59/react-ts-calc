@@ -114,14 +114,14 @@ function Calc() {
     <div className="min-h-screen bg-gray-100 flex items-center justify-center font-montserrat">
       <div className="container mx-auto p-4">
         <div className="max-w-lg mx-auto bg-gradient-to-b from-gray-100 to-white shadow-lg rounded-lg p-6">
-          <h1 className="text-3xl font-semibold text-center text-gray-800 mb-4">
+          <h1 className="text-3xl font-semibold text-center text-gray-800 mb-5">
             Formula Calculator
           </h1>
 
           {/* Display LaTeX */}
           {config.featureFlags.allowLatexRendering && (
             <div
-              className="p-4 bg-gray-50 border rounded shadow-inner whitespace-pre-wrap word-wrap break-word min-h-[80px] text-lg"
+              className="p-4 bg-gray-50 border rounded whitespace-pre-wrap word-wrap break-word min-h-[80px] text-lg mb-4"
               dangerouslySetInnerHTML={{ __html: renderLatex() }}
             />
           )}

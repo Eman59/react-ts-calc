@@ -1,27 +1,45 @@
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
 
 export const FormulaInput: React.FC<{
   formula: string;
   setFormula: (value: string) => void;
 }> = ({ formula, setFormula }) => {
-  const inputRef = useRef<HTMLInputElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // To store the colors assigned to variables
   const variableColorMap: { [key: string]: string } = {};
   const colorPalette = [
-    "text-red-500", "text-blue-500", "text-green-500", "text-yellow-500", 
-    "text-purple-500", "text-orange-500", "text-pink-500", "text-teal-500"
+    "text-red-500",
+    "text-blue-500",
+    "text-green-500",
+    "text-yellow-500",
+    "text-purple-500",
+    "text-orange-500",
+    "text-pink-500",
+    "text-teal-500",
   ];
   let colorIndex = 0;
 
+  // Resize the textarea as the content changes
+  const handleResize = () => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto'; // Reset height to auto
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`; // Set height based on content
+    }
+  };
+
+  useEffect(() => {
+    handleResize(); // Resize the textarea on mount and content change
+  }, [formula]);
+
   const highlightFormula = (text: string) => {
-    const operatorRegex = /(\+|\-|\*|\/|\^)/g; // Operators
+    const operatorRegex = /(\+|-|\*|\/|\^)/g; // Operators
     const functionRegex = /\b(sin|cos|tan|log|sqrt|abs)\b/gi; // Functions
     const numberRegex = /\b\d+(\.\d+)?\b/g; // Numbers
     const variableRegex = /\b[a-zA-Z_][a-zA-Z0-9_]*\b/g; // Variables
 
     const tokens: React.JSX.Element[] = [];
-    let match;
+    let match: RegExpExecArray | [string] | null;
     let lastIndex = 0;
 
     // Combined regex to tokenize
@@ -45,13 +63,19 @@ export const FormulaInput: React.FC<{
       // Highlight based on the matched group
       if (operatorRegex.test(matchedText)) {
         tokens.push(
-          <span key={`operator-${match.index}`} className="text-blue-500 font-bold">
+          <span
+            key={`operator-${match.index}`}
+            className="text-blue-500 font-bold"
+          >
             {matchedText}
           </span>
         );
       } else if (functionRegex.test(matchedText)) {
         tokens.push(
-          <span key={`function-${match.index}`} className="text-green-500 font-semibold">
+          <span
+            key={`function-${match.index}`}
+            className="text-green-500 font-semibold"
+          >
             {matchedText}
           </span>
         );
@@ -65,19 +89,23 @@ export const FormulaInput: React.FC<{
         // If variable is already assigned a color, reuse that color
         if (!variableColorMap[matchedText]) {
           // Assign a new color if not yet assigned
-          variableColorMap[matchedText] = colorPalette[colorIndex % colorPalette.length];
+          variableColorMap[matchedText] =
+            colorPalette[colorIndex % colorPalette.length];
           colorIndex++;
         }
 
         tokens.push(
-          <span key={`variable-${match.index}`} className={variableColorMap[matchedText]}>
+          <span
+            key={`variable-${match.index}`}
+            className={variableColorMap[matchedText]}
+          >
             {matchedText}
           </span>
         );
       }
 
       lastIndex = match.index + matchedText.length;
-    } 
+    }
 
     // Add remaining unmatched text as plain text
     if (lastIndex < text.length) {
@@ -94,20 +122,20 @@ export const FormulaInput: React.FC<{
   return (
     <div className="relative w-full">
       {/* Highlighted Formula Overlay */}
-      <div
-        className="absolute inset-0 pointer-events-none font-mono text-left whitespace-pre-wrap break-words p-2 overflow-hidden"
-      >
+      <div className="absolute inset-0 pointer-events-none font-mono text-left whitespace-pre-wrap break-words p-2 overflow-hidden">
         {highlightFormula(formula)}
       </div>
 
-      {/* Transparent Input Field */}
-      <input
-        ref={inputRef}
-        type="text"
+      {/* Transparent Textarea Field */}
+      <textarea
+        ref={textareaRef}
         value={formula}
-        onChange={(e) => setFormula(e.target.value)}
-        className="w-full border rounded p-2 text-transparent bg-gray-100 caret-black font-mono focus:outline-none focus:ring-0 relative"
-        placeholder="Enter formula (e.g., a + sin(b) * c)"
+        onChange={(e: { target: { value: string } }) => {
+          setFormula(e.target.value);
+          handleResize(); // Resize on change
+        }}
+        className="w-full border-2 border-solid border-blue-200 shadow-sm inner-shadow rounded p-2 text-transparent bg-gray-100 caret-black font-mono focus:outline-none focus:ring-0 relative resize-none overflow-hidden scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-700"
+        placeholder="Enter formula here (e.g., a + sin(b) * c)"
         spellCheck={false}
         style={{
           backgroundColor: "transparent",

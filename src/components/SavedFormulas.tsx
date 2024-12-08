@@ -1,6 +1,10 @@
 import React from "react";
 import { config } from "../config/config.ts";
-import { cleanFormula, copyToClipboard, removeFormula } from "../utils/index.tsx";
+import {
+  cleanFormula,
+  copyToClipboard,
+  removeFormula,
+} from "../utils/index.tsx";
 import CopyIcon from "../assets/copy.tsx";
 import DeleteIcon from "../assets/delete.tsx";
 
@@ -14,7 +18,10 @@ interface SavedFormulasProps {
   setSavedFormulas: React.Dispatch<React.SetStateAction<SavedFormula[]>>;
 }
 
-const SavedFormulas: React.FC<SavedFormulasProps> = ({ savedFormulas, setSavedFormulas }) => {
+const SavedFormulas: React.FC<SavedFormulasProps> = ({
+  savedFormulas,
+  setSavedFormulas,
+}) => {
   return (
     <div className="w-full max-w-md mx-auto bg-white shadow-lg p-4 rounded mt-6">
       <h2 className="text-lg font-bold text-gray-800">Saved Formulas</h2>
@@ -44,7 +51,9 @@ const SavedFormulas: React.FC<SavedFormulasProps> = ({ savedFormulas, setSavedFo
                 )}
                 {config.permissions.canDeleteSavedFormulas && (
                   <button
-                    onClick={() => removeFormula(index, savedFormulas, setSavedFormulas)}
+                    onClick={() =>
+                      removeFormula(index, savedFormulas, setSavedFormulas)
+                    }
                     className="text-red-500 font-semibold underline hover:text-red-600 transition"
                   >
                     <DeleteIcon />

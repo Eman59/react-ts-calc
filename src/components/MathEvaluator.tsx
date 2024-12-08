@@ -119,7 +119,7 @@ export class MathEvaluator {
     const tokens: string[] = [];
     let currentToken = "";
     const advancedFunctions = Object.keys(this.advancedFunctions);
-  
+
     for (let i = 0; i < formula.length; i++) {
       const char = formula[i];
       const remainingFormula = formula.slice(i);
@@ -152,7 +152,8 @@ export class MathEvaluator {
           currentToken = char; // Start the number (e.g., "1")
         } else if (
           char.match(/\d/) &&
-          (i + 1 < formula.length && formula[i + 1].match(/[a-zA-Z]/))
+          i + 1 < formula.length &&
+          formula[i + 1].match(/[a-zA-Z]/)
         ) {
           // Case when a number is followed by a variable (e.g., "1n" -> "1 * n")
           if (currentToken) {
@@ -160,10 +161,7 @@ export class MathEvaluator {
           }
           tokens.push(char); // Push the number (e.g., "1")
           tokens.push("*"); // Insert multiplication symbol
-        } else if (
-          char.match(/[a-zA-Z]/) &&
-          currentToken.match(/[a-zA-Z]/)
-        ) {
+        } else if (char.match(/[a-zA-Z]/) && currentToken.match(/[a-zA-Z]/)) {
           // Handle adjacent variables (e.g., "aa" -> "a * a")
           tokens.push(currentToken); // Push the previous variable (e.g., "a")
           tokens.push("*"); // Insert multiplication symbol
@@ -173,11 +171,11 @@ export class MathEvaluator {
         }
       }
     }
-  
+
     if (currentToken) {
       tokens.push(currentToken);
     }
-  
+
     return tokens;
   }
 

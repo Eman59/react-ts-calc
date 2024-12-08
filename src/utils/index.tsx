@@ -9,7 +9,11 @@ export const copyToClipboard = (latex: string) => {
   navigator.clipboard.writeText(cleanFormula(latex)).then(() => {});
 };
 
-export const removeFormula = (index: number, savedFormulas: SavedFormula[], setSavedFormulas: React.Dispatch<React.SetStateAction<SavedFormula[]>>) => {
+export const removeFormula = (
+  index: number,
+  savedFormulas: SavedFormula[],
+  setSavedFormulas: React.Dispatch<React.SetStateAction<SavedFormula[]>>
+) => {
   const updated = savedFormulas.filter((_, i) => i !== index);
   setSavedFormulas(updated);
   localStorage.setItem("savedFormulas", JSON.stringify(updated));

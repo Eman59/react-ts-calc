@@ -22,5 +22,5 @@ export const config = {
     canManageVariables: true, // Keep if users should manage (edit) variables,
     canCopyFormula: true, // Permission for copying formulas to clipboard
     canDeleteSavedFormulas: true, // Whether the user can delete saved formulas
-  }
+  },
 };

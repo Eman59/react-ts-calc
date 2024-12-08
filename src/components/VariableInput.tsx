@@ -20,8 +20,8 @@ export const VariableInput: React.FC<{
         type="text"
         value={value || ""}
         onChange={handleInputChange}
-        className="flex-grow border rounded px-2 py-1"
-        placeholder="Enter a numeric value"
+        className="flex-grow border border-gray-300 rounded px-2 py-1 focus:outline-none focus:border-blue-500 focus:ring focus:ring-blue-200"
+        placeholder="Enter a variable value (e.g., n = 10)"
       />
     </div>
   );
